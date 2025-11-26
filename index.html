@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>天气预报查询工具 - 实时天气查询与7天预报 | 智能定位天气</title>
+    <meta name="description" content="免费在线天气预报查询工具，支持全球城市天气查询。提供实时天气、7天天气预报、温度、湿度、风速等详细信息。自动IP定位，一键查询热门城市天气。">
+    <meta name="keywords" content="天气预报,天气查询,实时天气,7天天气预报,城市天气,天气预报查询,weather,天气,气温,湿度,风速">
+    <meta name="author" content="天气预报查询工具">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="天气预报查询工具 - 实时天气查询与7天预报">
+    <meta property="og:description" content="免费在线天气预报查询工具，支持全球城市实时天气查询和未来7天预报。自动定位，热门城市快速查询。">
+    <meta property="og:site_name" content="天气预报查询工具">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="天气预报查询工具 - 实时天气查询与7天预报">
+    <meta name="twitter:description" content="免费在线天气预报查询工具，支持全球城市实时天气查询和未来7天预报。">
+
+    <!-- 移动端优化 -->
+    <meta name="theme-color" content="#1877f2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="天气预报">
+
+    <!-- 搜索引擎 -->
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+
+        <header>
+            <h1>🌤️ 天气预报查询</h1>
+            <p class="subtitle">查看全球各地实时天气和未来7天预报</p>
+        </header>
+
+        <!-- 搜索区域 -->
+        <div class="search-section">
+            <div class="search-box">
+                <input
+                    type="text"
+                    id="cityInput"
+                    placeholder="请输入城市名称（如：北京、Beijing、Shanghai）"
+                    autocomplete="off"
+                >
+                <button id="searchBtn" onclick="searchWeather()">
+                    <span class="btn-text">查询天气</span>
+                    <span class="btn-icon">🔍</span>
+                </button>
+            </div>
+            <div class="hot-cities-inline">
+                <span class="hot-label">热门：</span>
+                <a href="javascript:void(0)" onclick="searchCity('北京')">北京</a>
+                <a href="javascript:void(0)" onclick="searchCity('上海')">上海</a>
+                <a href="javascript:void(0)" onclick="searchCity('广州')">广州</a>
+                <a href="javascript:void(0)" onclick="searchCity('深圳')">深圳</a>
+                <a href="javascript:void(0)" onclick="searchCity('杭州')">杭州</a>
+                <a href="javascript:void(0)" onclick="searchCity('成都')">成都</a>
+                <a href="javascript:void(0)" onclick="searchCity('重庆')">重庆</a>
+                <a href="javascript:void(0)" onclick="searchCity('香港')">香港</a>
+                <a href="javascript:void(0)" onclick="searchCity('台北')">台北</a>
+            </div>
+        </div>
+
+        <!-- 加载提示 -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>正在加载天气数据...</p>
+        </div>
+
+        <!-- 错误提示 -->
+        <div id="error" class="error" style="display: none;"></div>
+
+        <!-- 当前天气 -->
+        <div id="currentWeather" class="current-weather" style="display: none;">
+            <div class="weather-header">
+                <h2 id="cityName"></h2>
+                <p id="updateTime"></p>
+            </div>
+            <div class="weather-main">
+                <div class="temperature-section">
+                    <img id="weatherIcon" src="" alt="天气图标">
+                    <div class="temp-info">
+                        <div class="temp-current" id="temperature"></div>
+                        <div class="temp-desc" id="weatherDesc"></div>
+                    </div>
+                </div>
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <span class="detail-label">体感温度</span>
+                        <span class="detail-value" id="feelsLike"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">湿度</span>
+                        <span class="detail-value" id="humidity"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">风速</span>
+                        <span class="detail-value" id="windSpeed"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">能见度</span>
+                        <span class="detail-value" id="visibility"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">气压</span>
+                        <span class="detail-value" id="pressure"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">紫外线指数</span>
+                        <span class="detail-value" id="uv"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7天预报 -->
+        <div id="forecast" class="forecast-section" style="display: none;">
+            <h3>📅 未来7天天气预报</h3>
+            <div id="forecastContainer" class="forecast-container"></div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="instructions">
+            <h3>📖 使用说明</h3>
+            <ul>
+                <li>首次访问时会自动根据您的IP地址定位并显示当前位置天气</li>
+                <li>在搜索框输入城市名称（支持中文/英文），点击"查询天气"</li>
+                <li>或者点击上方热门城市快速查询</li>
+                <li>查看当前天气、体感温度、湿度、风速等详细信息</li>
+                <li>浏览未来7天的天气预报</li>
+            </ul>
+            <div class="api-notice">
+                <strong>注意：</strong>首次使用需要在 app.js 中配置您的 API 密钥。
+                免费获取：<a href="https://www.weatherapi.com/signup.aspx" target="_blank">WeatherAPI.com</a>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer>
+            <p>数据来源：<a href="https://www.weatherapi.com" target="_blank">WeatherAPI.com</a></p>
+            <p>© 2024 天气预报查询工具</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
