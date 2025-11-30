@@ -64,116 +64,6 @@ const API_KEY = '你的API密钥';
 3. **热门城市快速查询**：
    - 点击搜索框下方的热门城市链接即可快速查询
 
-## 功能说明
-
-### 当前天气显示
-
-显示内容包括：
-- 城市名称和国家
-- 更新时间
-- 天气图标和描述
-- 当前温度
-- 体感温度
-- 湿度
-- 风速
-- 能见度
-- 气压
-- 紫外线指数
-
-### 7天天气预报
-
-每天显示：
-- 日期和星期
-- 天气图标
-- 最高/最低温度
-- 天气描述
-- 平均湿度
-- 最大风速
-
-## 技术栈
-
-- **HTML5**：结构语言
-- **CSS3**：样式设计（支持渐变、动画、响应式）
-- **JavaScript (ES6+)**：业务逻辑（使用Async/Await、Fetch API）
-- **LocalStorage**：本地数据缓存
-- **WeatherAPI.com**：天气数据接口
-
-## 缓存机制
-
-为了提升用户体验和减少API请求次数，应用采用了智能缓存策略：
-
-### 工作原理
-
-1. **首次查询**：请求API获取天气数据，并保存到 localStorage
-2. **5分钟内再次查询**：直接从本地缓存读取，无需请求API
-3. **超过5分钟**：缓存过期，重新请求API并更新缓存
-4. **自动清理**：页面加载时自动清除所有过期缓存
-
-### 技术细节
-
-- **存储方式**：使用 localStorage 持久化存储
-- **缓存键名**：`weather_cache_城市名`（小写）
-- **有效期**：5分钟（300秒）
-- **数据结构**：
-  ```javascript
-  {
-    data: {...},      // 完整的天气数据
-    timestamp: 1234567890  // 保存时间戳
-  }
-  ```
-
-
-
-## 文件结构
-
-```
-web_weather/
-├── index.html      # 主HTML文件
-├── style.css       # 样式文件
-├── app.js          # JavaScript逻辑
-└── README.md       # 使用说明
-```
-
-
-
-
-## 常见问题
-
-### 1. 提示"请先在 app.js 中配置您的 API 密钥"
-
-**解决方法**：按照上述步骤获取并配置API密钥
-
-### 2. 提示"未找到该城市"
-
-**解决方法**：
-- 检查城市名称拼写是否正确
-- 尝试使用英文城市名称
-- 尝试添加国家名称，如"Beijing, China"
-
-### 3. 提示"网络连接失败"
-
-**解决方法**：
-- 检查网络连接
-- 确认防火墙没有阻止访问
-- 使用本地服务器而非直接打开文件
-
-### 4. CORS跨域错误
-
-**解决方法**：使用本地服务器运行（参见"第三步：启动应用"）
-
-## API限制
-
-WeatherAPI.com免费版限制：
-- 每月100万次请求
-- 每天最多10天预报（本项目使用7天）
-- 支持历史天气查询
-- 完全够个人使用
-
-## 注意事项
-
-1. **不要暴露API密钥**：如果将代码上传到GitHub等公开平台，请删除或隐藏API密钥
-2. **遵守API使用条款**：不要频繁请求，建议添加缓存机制
-3. **HTTPS访问**：如果部署到服务器，建议使用HTTPS
 
 ## 生产环境部署
 
@@ -202,7 +92,7 @@ brew install nginx
 创建站点配置文件：
 
 ```bash
-sudo nano /etc/nginx/sites-available/weather
+sudo vim /etc/nginx/conf.d/weather.conf
 ```
 
 添加以下配置：
@@ -237,36 +127,9 @@ server {
 }
 ```
 
-#### 3. 部署项目文件
 
-```bash
-# 创建项目目录
-sudo mkdir -p /var/www/weather
 
-# 复制项目文件
-sudo cp index.html /var/www/weather/
-sudo cp style.css /var/www/weather/
-sudo cp app.js /var/www/weather/
-
-# 设置权限
-sudo chown -R www-data:www-data /var/www/weather
-sudo chmod -R 755 /var/www/weather
-```
-
-#### 4. 启用站点配置
-
-```bash
-# 创建符号链接
-sudo ln -s /etc/nginx/sites-available/weather /etc/nginx/sites-enabled/
-
-# 测试配置
-sudo nginx -t
-
-# 重启 Nginx
-sudo systemctl restart nginx
-```
-
-#### 5. 配置 HTTPS（推荐）
+#### 5. 配置 HTTPS（可选）
 
 使用 Let's Encrypt 免费 SSL 证书：
 
@@ -364,74 +227,102 @@ sudo tail -f /var/log/nginx/error.log
 sudo tail -f /var/log/nginx/access.log
 ```
 
-#### 8. 性能优化建议
 
-在 Nginx 配置中添加：
 
-```nginx
-# 开启 HTTP/2
-listen 443 ssl http2;
+## 技术栈
 
-# 增加缓冲区大小
-client_body_buffer_size 128k;
-client_max_body_size 10m;
+- **HTML5**：结构语言
+- **CSS3**：样式设计（支持渐变、动画、响应式）
+- **JavaScript (ES6+)**：业务逻辑（使用Async/Await、Fetch API）
+- **LocalStorage**：本地数据缓存
+- **WeatherAPI.com**：天气数据接口
 
-# 启用 Brotli 压缩（需要安装模块）
-brotli on;
-brotli_types text/plain text/css application/json application/javascript text/xml application/xml;
+## 缓存机制
 
-# 配置连接超时
-keepalive_timeout 65;
-send_timeout 60;
+为了提升用户体验和减少API请求次数，应用采用了智能缓存策略：
+
+### 工作原理
+
+1. **首次查询**：请求API获取天气数据，并保存到 localStorage
+2. **5分钟内再次查询**：直接从本地缓存读取，无需请求API
+3. **超过5分钟**：缓存过期，重新请求API并更新缓存
+4. **自动清理**：页面加载时自动清除所有过期缓存
+
+### 技术细节
+
+- **存储方式**：使用 localStorage 持久化存储
+- **缓存键名**：`weather_cache_城市名`（小写）
+- **有效期**：5分钟（300秒）
+- **数据结构**：
+  ```javascript
+  {
+    data: {...},      // 完整的天气数据
+    timestamp: 1234567890  // 保存时间戳
+  }
+  ```
+
+
+
+## 文件结构
+
+```
+web_weather/
+├── index.html      # 主HTML文件
+├── style.css       # 样式文件
+├── app.js          # JavaScript逻辑
+└── README.md       # 使用说明
 ```
 
-### 使用 Docker 部署（可选）
 
-创建 `Dockerfile`:
 
-```dockerfile
-FROM nginx:alpine
 
-# 复制项目文件
-COPY index.html /usr/share/nginx/html/
-COPY style.css /usr/share/nginx/html/
-COPY app.js /usr/share/nginx/html/
+## 常见问题
 
-# 复制自定义 Nginx 配置
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+### 1. 提示"请先在 app.js 中配置您的 API 密钥"
 
-EXPOSE 80
+**解决方法**：按照上述步骤获取并配置API密钥
 
-CMD ["nginx", "-g", "daemon off;"]
-```
+### 2. 提示"未找到该城市"
 
-构建并运行：
+**解决方法**：
+- 检查城市名称拼写是否正确
+- 尝试使用英文城市名称
+- 尝试添加国家名称，如"Beijing, China"
 
-```bash
-# 构建镜像
-docker build -t weather-app .
+### 3. 提示"网络连接失败"
 
-# 运行容器
-docker run -d -p 80:80 --name weather weather-app
-```
+**解决方法**：
+- 检查网络连接
+- 确认防火墙没有阻止访问
+- 使用本地服务器而非直接打开文件
 
-## 未来改进方向
+### 4. CORS跨域错误
 
-- [ ] 添加天气数据缓存功能
-- [ ] 支持定位获取当前位置天气
-- [ ] 添加天气预警功能
-- [ ] 支持多语言切换
-- [ ] 添加收藏城市功能
-- [ ] 支持摄氏度/华氏度切换
-- [ ] 添加天气动画背景
+**解决方法**：使用本地服务器运行（参见"第三步：启动应用"）
 
+## API限制
+
+WeatherAPI.com免费版限制：
+- 每月100万次请求
+- 每天最多10天预报（本项目使用7天）
+- 支持历史天气查询
+- 完全够个人使用
+
+## 注意事项
+
+1. **不要暴露API密钥**：如果将代码上传到GitHub等公开平台，请删除或隐藏API密钥
+2. **遵守API使用条款**：不要频繁请求，建议添加缓存机制
+3. **HTTPS访问**：如果部署到服务器，建议使用HTTPS
+
+
+ 
+
+  
 ## 许可证
 
 本项目采用 MIT 许可证，可自由使用和修改。
 
-## 联系方式
-
-如有问题或建议，欢迎反馈！
+ 
 
 ---
 
